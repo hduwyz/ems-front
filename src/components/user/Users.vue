@@ -49,7 +49,7 @@
       </el-table>
 
       <!-- 分页区域 -->
-      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[1, 2, 5, 10]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.current" :page-sizes="[1, 2, 5, 10]" :page-size="queryInfo.size" layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
     </el-card>
 
@@ -149,9 +149,9 @@ export default {
       queryInfo: {
         query: '',
         // 当前的页数
-        pagenum: 1,
+        current: 1,
         // 当前每页显示多少条数据
-        pagesize: 2
+        size: 2
       },
       userlist: [],
       total: 0,
@@ -223,33 +223,33 @@ export default {
   },
   methods: {
     async getUserList() {
-      const { data: res } = await this.$http.get('users', {
+      const { data: res } = await this.$http.get('user/query', {
         params: this.queryInfo
       })
       if (res.meta.status !== 200) {
         return this.$message.error('获取用户列表失败！')
       }
-      this.userlist = res.data.users
+      this.userlist = res.data.result
       this.total = res.data.total
       console.log(res)
     },
     // 监听 pagesize 改变的事件
     handleSizeChange(newSize) {
       // console.log(newSize)
-      this.queryInfo.pagesize = newSize
+      this.queryInfo.size = newSize
       this.getUserList()
     },
     // 监听 页码值 改变的事件
     handleCurrentChange(newPage) {
       console.log(newPage)
-      this.queryInfo.pagenum = newPage
+      this.queryInfo.current = newPage
       this.getUserList()
     },
     // 监听 switch 开关状态的改变
     async userStateChanged(userinfo) {
       console.log(userinfo)
       const { data: res } = await this.$http.put(
-        `users/${userinfo.id}/state/${userinfo.mg_state}`
+        `user/${userinfo.id}/state/${userinfo.mg_state}`
       )
       if (res.meta.status !== 200) {
         userinfo.mg_state = !userinfo.mg_state
